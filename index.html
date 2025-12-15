@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+  <head>
+    <title>QR Generator</title>
+    <style>
+      form {
+        width: 100%;
+        max-width: 1000px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0 1rem;
+      }
+
+      form > * {
+        display: grid;
+        grid-template-columns: subgrid;
+        align-items: center;
+        grid-column: 1 / -1;
+      }
+
+      .radio {
+        display: flex;
+        gap: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <form>
+        <label>
+          <p>Data</p>
+          <textarea name="data" placeholder="QR data"></textarea>
+        </label>
+        <label>
+          <p>Foreground Color</p>
+          <input
+            type="color"
+            name="fg"
+            value="#000000"
+            alpha
+            colorspace="limited-srgb"
+          />
+        </label>
+        <label>
+          <p>Background Color</p>
+          <input
+            type="color"
+            name="bg"
+            value="#ffffff"
+            alpha
+            colorspace="limited-srgb"
+          />
+        </label>
+        <div>
+          <p>Error correction level:</p>
+          <div class="radio">
+            <label><input type="radio" name="ec" value="L" /> Low (7%)</label>
+            <label>
+              <input type="radio" name="ec" value="M" checked /> Medium (15%)
+            </label>
+            <label>
+              <input type="radio" name="ec" value="Q" /> Quartile (25%)
+            </label>
+            <label><input type="radio" name="ec" value="H" /> High (30%)</label>
+          </div>
+        </div>
+        <div>
+          <p>Mode</p>
+          <div class="radio">
+            <label>
+              <input type="radio" name="mode" value="Micro" /> Micro
+            </label>
+            <label>
+              <input type="radio" name="mode" value="Standard" checked />
+              Standard
+            </label>
+            <label>
+              <input type="radio" name="mode" value="Auto" checked />
+              Auto
+            </label>
+          </div>
+        </div>
+        <label>
+          <p>Version (if Mode is not auto)</p>
+          <input type="range" name="version" min="1" max="40" value="9" />
+        </label>
+        <label>
+          <p>Size (pixels; approximate)</p>
+          <input type="number" name="size" max="2048" value="200" />
+        </label>
+        <div>
+          <p>Format</p>
+          <div class="radio">
+            <label>
+              <input type="radio" name="format" value="Png" checked /> PNG
+            </label>
+            <label>
+              <input type="radio" name="format" value="Avif" />
+              AVIF
+            </label>
+            <label>
+              <input type="radio" name="format" value="Svg" />
+              SVG
+            </label>
+          </div>
+        </div>
+      </form>
+      <button onclick="generate()">Generate</button>
+    </div>
+    <script>
+      const form = document.querySelector("form");
+
+      function formatColor(color) {
+        return color.slice(1).padEnd(8, "f").toLowerCase();
+      }
+
+      function generate() {
+        const formdata = new FormData(form);
+        const data = formdata.get("data");
+        formdata.delete("data");
+        const fg = formatColor(formdata.get("fg"));
+        const bg = formatColor(formdata.get("bg"));
+        const query = new URLSearchParams({ ...formdata, fg, bg });
+        window.location.href = `/${encodeURIComponent(data)}?${query}`;
+      }
+    </script>
+  </body>
+</html>
