@@ -5,7 +5,7 @@ use serde::Deserialize;
 use serde_hex::{SerHexOpt, StrictCap};
 use serde_querystring::ParseMode;
 use std::env;
-use std::io::stdout;
+use std::io::{Write, stdout};
 
 #[derive(Deserialize, Debug)]
 struct Options {
@@ -34,7 +34,12 @@ fn handle() -> Result<(), String> {
     if let Some(bg) = options.bg {
         renderer.light_color(Rgba::<u8>(bg));
     }
-    let encoder = PngEncoder::new(stdout().lock());
+    let mut stdout = stdout().lock();
+    writeln!(stdout, "Content-type: image/png").map_err(|error| error.to_string())?;
+    writeln!(stdout, "Content-disposition: attachment; filename=qr.png")
+        .map_err(|error| error.to_string())?;
+    writeln!(stdout).map_err(|error| error.to_string())?;
+    let encoder = PngEncoder::new(stdout);
     let image = renderer.build();
     encoder
         .write_image(
@@ -49,6 +54,7 @@ fn handle() -> Result<(), String> {
 
 fn main() {
     if let Err(error) = handle() {
-        eprintln!("{error}");
+        println!("Content-type: text/plain");
+        println!("{error}");
     }
 }
