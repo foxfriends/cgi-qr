@@ -1,0 +1,11 @@
+[package]
+name = "cgi-qr"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+image = { version = "0.25.9", default-features = false, features = ["png", "serde"] }
+qrcode = "0.14.1"
+serde = { version = "1.0.228", features = ["derive"] }
+serde-hex = "0.1.0"
+serde-querystring = "0.3.0"
