@@ -8,8 +8,13 @@ An example configuration for Caddy, with [caddy-cgi](https://github.com/aksdb/ca
 
 ```
 {
+    order cgi after file_server
+}
+
+example.com {
     file_server / {
         root /var/www/cgi-qr
+        index index.html
     }
     cgi /* /usr/local/cgi-bin/cgi-qr
 }
