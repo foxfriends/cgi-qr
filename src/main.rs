@@ -17,9 +17,7 @@ struct Options {
     bg: Option<[u8; 4]>,
 }
 
-fn handle() -> Result<(), String> {
-    let path = env::var("PATH_INFO")
-        .expect("PATH_INFO environment variable is expected; is this being called by CGI?");
+fn generate_qr(data: String) -> Result<(), String> {
     let query = env::var("QUERY_STRING")
         .expect("QUERY_STRING environment variable is expected; is this being called by CGI?");
     let options: Options = serde_querystring::from_str(&query, ParseMode::UrlEncoded)
@@ -53,7 +51,24 @@ fn handle() -> Result<(), String> {
 }
 
 fn main() {
-    if let Err(error) = handle() {
+    let path = env::var("PATH_INFO")
+        .expect("PATH_INFO environment variable is expected; is this being called by CGI?");
+    if path.is_empty() {
+        println!("Content-type: text/html\n");
+        println!(
+            r#"
+            <!doctype html>
+            <html>
+                <head>
+                    <title>QR Generator</title>
+                </head>
+                <body>
+                    <textarea></textarea><button onclick='window.location.href = `/${{document.querySelector("textarea").value}}`'>Generate</button>
+                </body>
+            </html>
+            "#
+        );
+    } else if let Err(error) = generate_qr(path) {
         println!("Content-type: text/plain");
         println!("{error}");
     }
