@@ -17,12 +17,12 @@ struct Options {
     bg: Option<[u8; 4]>,
 }
 
-fn generate_qr(data: String) -> Result<(), String> {
+fn generate_qr(data: &str) -> Result<(), String> {
     let query = env::var("QUERY_STRING")
         .expect("QUERY_STRING environment variable is expected; is this being called by CGI?");
     let options: Options = serde_querystring::from_str(&query, ParseMode::UrlEncoded)
         .map_err(|error| error.to_string())?;
-    let qrcode = QrCode::new(path.as_bytes()).map_err(|error| error.to_string())?;
+    let qrcode = QrCode::new(data.as_bytes()).map_err(|error| error.to_string())?;
     let mut renderer = qrcode.render::<Rgba<u8>>();
     let width = u32::min(options.width.unwrap_or(256), 1024);
     renderer.min_dimensions(width, width);
@@ -50,25 +50,23 @@ fn generate_qr(data: String) -> Result<(), String> {
     Ok(())
 }
 
+const HOMEPAGE: &str = r#"<!doctype html>
+<html>
+    <head>
+        <title>QR Generator</title>
+    </head>
+    <body>
+        <textarea></textarea><button onclick='window.location.href = `/${document.querySelector("textarea").value}`'>Generate</button>
+    </body>
+</html>"#;
+
 fn main() {
     let path = env::var("PATH_INFO")
         .expect("PATH_INFO environment variable is expected; is this being called by CGI?");
-    if path.is_empty() {
+    if path == "/" {
         println!("Content-type: text/html\n");
-        println!(
-            r#"
-            <!doctype html>
-            <html>
-                <head>
-                    <title>QR Generator</title>
-                </head>
-                <body>
-                    <textarea></textarea><button onclick='window.location.href = `/${{document.querySelector("textarea").value}}`'>Generate</button>
-                </body>
-            </html>
-            "#
-        );
-    } else if let Err(error) = generate_qr(path) {
+        println!("{}", HOMEPAGE);
+    } else if let Err(error) = generate_qr(&path[1..]) {
         println!("Content-type: text/plain");
         println!("{error}");
     }
