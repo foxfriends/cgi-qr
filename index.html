@@ -68,11 +68,12 @@
           <p>Mode</p>
           <div class="radio">
             <label>
-              <input type="radio" name="mode" value="Micro" /> Micro
+              <input type="radio" name="mode" value="Micro" /> Micro (Version
+              must be 1-4)
             </label>
             <label>
               <input type="radio" name="mode" value="Standard" checked />
-              Standard
+              Standard (Version must be 1-40)
             </label>
             <label>
               <input type="radio" name="mode" value="Auto" checked />
@@ -82,7 +83,7 @@
         </div>
         <label>
           <p>Version (if Mode is not auto)</p>
-          <input type="range" name="version" min="1" max="40" value="9" />
+          <input type="number" name="version" min="1" max="40" value="9" />
         </label>
         <label>
           <p>Size (pixels; approximate)</p>
@@ -118,9 +119,9 @@
         const formdata = new FormData(form);
         const data = formdata.get("data");
         formdata.delete("data");
-        const fg = formatColor(formdata.get("fg"));
-        const bg = formatColor(formdata.get("bg"));
-        const query = new URLSearchParams({ ...formdata, fg, bg });
+        formdata.set("fg", formatColor(formdata.get("fg")));
+        formdata.set("bg", formatColor(formdata.get("bg")));
+        const query = new URLSearchParams(formdata);
         window.location.href = `/${encodeURIComponent(data)}?${query}`;
       }
     </script>

@@ -169,7 +169,8 @@ fn main() {
     let path = env::var("PATH_INFO")
         .expect("PATH_INFO environment variable is expected; is this being called by CGI?");
     if let Err(error) = generate_qr(&path[1..]) {
-        println!("Content-type: text/plain");
+        eprintln!("{error}");
+        println!("Content-type: text/plain\n");
         println!("{error}");
     }
 }
