@@ -26,13 +26,13 @@ enum Ec {
     H,
 }
 
-impl Into<EcLevel> for Ec {
-    fn into(self) -> EcLevel {
-        match self {
-            Self::L => EcLevel::L,
-            Self::M => EcLevel::M,
-            Self::Q => EcLevel::Q,
-            Self::H => EcLevel::H,
+impl From<Ec> for EcLevel {
+    fn from(ec: Ec) -> EcLevel {
+        match ec {
+            Ec::L => EcLevel::L,
+            Ec::M => EcLevel::M,
+            Ec::Q => EcLevel::Q,
+            Ec::H => EcLevel::H,
         }
     }
 }
